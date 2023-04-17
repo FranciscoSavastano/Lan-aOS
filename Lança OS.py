@@ -27,7 +27,7 @@ class app():
         self.frame_botoes = Frame()
         self.frame_botoes.place(relx=0.04, rely= 0.05, relwidth=0.9, relheight=0.9)
         entrytext = Label(
-            text='Codigo do parceiro: \n\n\nNumero da Nota: \n\n\nData de emissão: \n\n\nNumero da OS: \n\n\nTipo de operação: \n\n\n\n\nProblema:\n\n\n\n\nNumero da NS:\n\n\n\n Consultor(a):', font=('verdana', 11))
+            text='Codigo do produto: \n\n\nNumero da Nota: \n\n\nData de emissão: \n\n\nNumero da OS: \n\n\nTipo de operação: \n\n\n\n\nProblema:\n\n\n\n\nNumero da NS:\n\n\n\n Consultor(a):', font=('verdana', 11))
         entrytext.place(relx=0.06, rely=0.134)
     def botoes(self):
         global entryCodPar, entryOs, entryNF, entryEmissao, entryNS, entryConsul, entryTroca, entryProblema
@@ -52,6 +52,7 @@ class app():
         enviar = Button(text = ("Enviar"), command= self.Oswin)
         enviar.place(relx= 0.4, rely= 0.9)
     def Oswin(self):
+        global CodPar, Nf, Emissao, Os, Troca, Problema, Ns, Consultor
         CodPar = entryCodPar.get()
         Nf = entryNF.get()
         Emissao = entryEmissao.get()
@@ -59,17 +60,27 @@ class app():
         Troca = entryTroca.get()
         Problema = entryProblema.get("1.0", END)
         Ns = entryNS.get("1.0", END)
+        Consultor = entryConsul.get()
         win = Toplevel()
         win.geometry('400x300')
         win.resizable(False, False)
         res_1 = Frame(win)
         res_1.place(relx=0, rely=0, relheight=1, relwidth=1)
         lab_1 = Label(res_1, bg='#d3d3d3',
-                      text = f"Codigo do parceiro : {CodPar}\n Numero da Nota: {Nf}\n Emissão da Nota: {Emissao}\n Numero da OS: {Os} \n Tipo de operação: {Troca}\n Problema: {Problema} \n NS do produto: {Ns}")
+                      text = f"Codigo do produto : {CodPar}\n Numero da Nota: {Nf}\n Emissão da Nota: {Emissao}\n Numero da OS: {Os} \n Tipo de operação: {Troca}\n Problema: {Problema} \n NS do produto: {Ns}")
         lab_1.place(relheight=1, relwidth=1)
-        writetxt = Button(res_1, text = ("Salvar como texto"), command= self.Oswin)
+        writetxt = Button(res_1, text = ("Salvar como texto"), command= self.Writetxt)
         writetxt.place(relx= 0.2, rely= 0.9)
-        writeexcel = Button(res_1,text = ("Salvar em excel"), command= self.Oswin)
+        writeexcel = Button(res_1,text = ("Salvar em excel"), command= self.Writeexc)
         writeexcel.place(relx= 0.5, rely= 0.9)
-
+    def Writetxt(self):
+        file = open(f"Os {Os} {Troca}.txt", "x")
+        file.write(f"Numero da OS: {Os}\n")
+        file.write(f"Numero da NF: {Nf}     Emissão: {Emissao}\n")
+        file.write(f"Problema: {Problema}\n")
+        file.write(f"Codigo do produto: {CodPar}\n")
+        file.write(f"NS do produto: {Ns}\n")
+        file.write(f"Cliente de {Consultor}\n")
+    def Writeexc(self):
+        print('excel')
 app()
