@@ -1,6 +1,9 @@
 from tkinter import *
 from tkinter import ttk
 from tkcalendar import DateEntry
+from datetime import date
+from xlwt import *
+import openpyxl
 
 root = Tk()
 
@@ -62,13 +65,41 @@ class app():
         Ns = entryNS.get("1.0", END)
         Consultor = entryConsul.get()
         win = Toplevel()
-        win.geometry('400x300')
+        win.geometry('600x600')
         win.resizable(False, False)
         res_1 = Frame(win)
         res_1.place(relx=0, rely=0, relheight=1, relwidth=1)
         lab_1 = Label(res_1, bg='#d3d3d3',
                       text = f"Codigo do produto : {CodPar}\n Numero da Nota: {Nf}\n Emissão da Nota: {Emissao}\n Numero da OS: {Os} \n Tipo de operação: {Troca}\n Problema: {Problema} \n NS do produto: {Ns}")
         lab_1.place(relheight=1, relwidth=1)
+        res_2 = Frame(win, bg='#d3d3d3' )
+        lab_2 = Label(res_2, bg='#d3d3d3', text = f"Operador \n\n\n Valor\n\n\n Unidade \n\n\n Nu \n\n\n Codigo do Cliente" ,font=('verdana', 9))
+        lab_2.place(relx = 0.2, rely = 0.10)
+        
+        res_2.place(relx = 0, rely = 0, relheight=0.35, relwidth=1)
+        global entryOperador, entryValor, entryUnidade, entryNu, entryCodCliente, entryChaveAcesso, entryNotaDev
+        entryOperador = Entry(res_2)
+        entryValor = Entry(res_2)
+        entryUnidade = ttk.Combobox(res_2,       state="readonly",
+        values=["CENTRO", "BONSUCESSO", "VILAR", "TAQUARA", "CAMPO GRANDE", "CABO FRIO"]
+        )
+        entryNu = Entry(res_2)
+        entryCodCliente = Entry(res_2)
+        if(Troca == "Compra Errada"):
+            lab_3 = Label(res_2, bg="#d3d3d3", text = "Chave de Acesso\n\n\n Num. Nota de devolução", font=('verdana', 9))
+            lab_3.place(relx= 0.7, rely = 0.10)
+            entryChaveAcesso = Entry(res_2)
+            entryNotaDev = Entry(res_2)
+            entryChaveAcesso.place(relx = 0.5, rely = 0.10)
+            entryNotaDev.place(relx = 0.5, rely = 0.294)
+        else:
+            entryChaveAcesso = None
+            entryNotaDev = None
+        entryOperador.place(relx = 0, rely = 0.10)
+        entryValor.place(relx = 0, rely = 0.29)
+        entryUnidade.place(relx = 0, rely = 0.49)
+        entryNu.place(relx = 0, rely = 0.68)
+        entryCodCliente.place(relx = 0, rely = 0.894)
         writetxt = Button(res_1, text = ("Salvar como texto"), command= self.Writetxt)
         writetxt.place(relx= 0.2, rely= 0.9)
         writeexcel = Button(res_1,text = ("Salvar em excel"), command= self.Writeexc)
@@ -81,6 +112,67 @@ class app():
         file.write(f"Codigo do produto: {CodPar}\n")
         file.write(f"NS do produto: {Ns}\n")
         file.write(f"Cliente de {Consultor}\n")
+        
+        file.close()
     def Writeexc(self):
-        print('excel')
+        CodCliente =Valor =Unidade =Nu =Operador = ChaveAcesso = NumDev = None
+        CodCliente = entryCodCliente.get()
+        Valor = entryValor.get()
+        Unidade = entryUnidade.get()
+        Nu = entryNu.get()
+        Operador = entryOperador.get()
+        if(entryChaveAcesso and entryNotaDev != None ): 
+            
+            ChaveAcesso = entryChaveAcesso.get()
+            NumDev = entryNotaDev.get()
+        
+        try:
+            file = "C:/Users/MAKE-LAB/Documents/Controle Compartilhado os.xlsx"
+            wb = openpyxl.load_workbook(filename=file)
+            ws = wb["Planilha1"]
+            lvazia = None
+            cellval = None
+            line = 4
+            while lvazia == None:
+                cellval = ws[f"B{line}"].value
+                if cellval == None:
+                    lvazia = line
+                    x = 2
+                    while x < 15:
+                        coord = ws.cell(row = line , column= x)
+
+                        if(coord.value == None):
+                            pass
+                        else:
+                           line += 1
+                           x = 2
+                        x += 1
+                    print("Não foi encontrado items")
+                #else:
+                line += 1
+            campos = [Os, date.today(), Nf, NumDev, ChaveAcesso, CodCliente, Emissao, Nu, Troca, Valor, Consultor, Unidade, Operador, "-"]  
+            for i in range(len(campos)):
+                print(campos[i])
+                if(campos[i] == None):
+                    campos[i] = "-"
+                elif (campos[i] == ""):
+                    campos[i] = "-"
+                    
+            line -= 1
+            x = 2
+            for i in range(13):
+                
+                ws.cell(line, x).value = campos[i]
+                x += 1
+            print(line, x)
+            print(ws.cell(line, x).value)
+            
+            wb.save("teste.xlsx")
+        except Exception as e: print(e)
+        # Workbook is created
+            #wb = Workbook()
+        
+        # add_sheet is used to create sheet.
+        
+        
 app()
